@@ -1,0 +1,46 @@
+name: Comment Workflow Sample
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Thanks for pull request!'
+            })
+
+  multi-comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v5
+        env:
+          HEADLINE2: "Headline2 sample"
+          HEADLINE3: "Headline3 sample"
+          SUMMARY: "Summary"
+          CONTENT: "ContentContentContentContentContentContent"
+        with:
+          script: |
+            const output = `## \`${{ env.HEADLINE2 }}\`
+            ### 🖌\`${{ env.HEADLINE3 }}\`
+
+            <details>
+            <summary>${{ env.SUMMARY }}</summary>
+
+            \`\`\`${process.env.CONTENT}\`\`\`
+
+            </details>`;
+          
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
